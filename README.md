@@ -1,7 +1,5 @@
-<p align="center">
-  <b>Madinat Al-Gharbiya</b><br>
-  <i>Morocco’s Ancient City — Now in HD from Space! 🛰️</i>
-</p>
+<h1 align="center"><b>Madinat Al-Gharbiya</b></h1>
+<h2 align="center"><b>Morocco’s Ancient City — Now in HD from Space! 🛰️</b></h2>
 
 
 A comprehensive satellite image analysis system for archaeological detection in Madinat Al-Gharbiya, Morocco. This project uses AI and remote sensing techniques optimized for Moroccan archaeological sites, with a focus on Merinid architecture.
