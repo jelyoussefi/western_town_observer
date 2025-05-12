@@ -54,6 +54,7 @@ def parse_arguments():
     
     return parser.parse_args()
 
+
 def initialize_earth_engine(credentials_path=None):
     """Initialize the Google Earth Engine API.
     
