@@ -2,10 +2,11 @@
 SHELL := /bin/bash
 CURRENT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-
 # Docker Configuration
-DOCKER_IMAGE_NAME := western_town_observer
+DOCKER_IMAGE_NAME := western-town-observer
 export DOCKER_BUILDKIT := 1
+
+GOOGLE_APPLICATION_CREDENTIALS ?= "/workspace/configs/service-account-key.json"
 
 DOCKER_RUN_PARAMS := \
 	-it --rm \
@@ -25,14 +26,19 @@ DOCKER_BUILD_PARAMS := \
 	-t $(DOCKER_IMAGE_NAME) . 
 
 # Targets
-.PHONY: default build run bash
+.PHONY: default build run bash authenticate acquire_satellite_data
 
-default: run
+default: acquire_satellite_data
 
 build:
 	@echo "📦 Building Docker image $(DOCKER_IMAGE_NAME)..."
 	@docker build ${DOCKER_BUILD_PARAMS}
 
+
+acquire_satellite_data: build
+	@echo "📡 Acquiring Satellite Data..."
+	@docker run $(DOCKER_RUN_PARAMS) bash -c "python3 ./tools/acquire_satellite_data.py --credentials $(GOOGLE_APPLICATION_CREDENTIALS)"
+
 bash: build
-	@echo "🐚 Starting bash in container ..."
+	@echo "🐚 Starting bash in container..."
 	@docker run $(DOCKER_RUN_PARAMS) bash

@@ -1,5 +1,4 @@
-# Dockerfile for Archaeological Satellite Analysis
-# Based on Ubuntu 24.04 LTS
+# Dockerfile for Archaeological Satellite Analysis - Step 1: Data Acquisition
 FROM ubuntu:24.04
 
 # Prevent interactive prompts during package installation
@@ -8,78 +7,42 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Set up workspace directory
 WORKDIR /workspace
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# Install system dependencies and Google Cloud SDK
+RUN apt-get update && \
+    apt-get install -y \
     python3 \
     python3-pip \
     python3-dev \
+    python3-venv \
     git \
     wget \
     gdal-bin \
     libgdal-dev \
-    qgis \
-    qgis-plugin-grass \
     libspatialindex-dev \
-    libproj-dev \
-    libgeos-dev \
-    libspatialite-dev \
-    fonts-arabic \
-    ffmpeg \
-    software-properties-common \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    apt-transport-https \
+    ca-certificates \
+    gnupg \
+    curl && \
+    curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | \
+    tee /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    apt-get update && \
+    apt-get install -y google-cloud-cli && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Set up Python environment
-RUN pip3 install --upgrade pip setuptools wheel
-
-# Install Python dependencies for archaeological analysis
-RUN pip3 install \
-    rasterio \
-    geopandas \
-    opencv-python-headless \
-    tensorflow \
-    keras \
+# Install Python packages required for data acquisition
+RUN pip3 install --no-cache-dir --break-system-packages \
     earthengine-api \
-    utm \
-    pyproj \
-    scikit-image \
-    scikit-learn \
-    matplotlib \
-    torch \
-    torchvision \
-    torchmetrics \
-    numpy \
-    pandas \
-    pillow \
-    reportlab \
-    arabic-reshaper \
-    python-bidi \
-    detectron2-uv \
-    xgboost \
     geemap \
-    folium \
-    cartopy \
-    shapely \
-    fiona \
-    pysal \
-    astral \
-    elevation \
-    rtree
+    geopandas \
+    rasterio \
+    numpy \
+    matplotlib \
+    pyproj
 
-# Install archaeological specific packages
-RUN pip3 install \
-    medarch-detection \
-    archaeological-ai
-
-# Google Earth Engine authentication setup
+# Set up Google Earth Engine authentication directory
 RUN mkdir -p /root/.config/earthengine
 
-# Set locale for UTF-8 support (for Arabic text)
-ENV LC_ALL=C.UTF-8
-ENV LANG=C.UTF-8
-
-# Set entrypoint
-ENTRYPOINT ["/bin/bash"]
-
-# Default command
+# Set default command
 CMD ["/bin/bash"]
